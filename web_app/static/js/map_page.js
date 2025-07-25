@@ -1,4 +1,5 @@
 let map;
+let trafficLayer; // Layer to hold traffic segments
 
 let currentLayer = 'dark'; // Default layer
 const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -34,6 +35,119 @@ const layers = {
     }
 };
 
+// Function to get color based on speed
+function getSpeedColor(speed) {
+    if (speed === null || speed === -1) return '#808080'; // Gray for no data
+    if (speed >= 35) return '#00ff00'; // Green for fast
+    if (speed >= 25) return '#ffff00'; // Yellow for moderate
+    if (speed >= 15) return '#ff8800'; // Orange for slow
+    return '#ff0000'; // Red for very slow
+}
+
+// Function to get line width based on speed
+function getLineWidth(speed) {
+    if (speed === null || speed === -1) return 2;
+    if (speed >= 35) return 3;
+    if (speed >= 25) return 4;
+    if (speed >= 15) return 5;
+    return 6;
+}
+let hold_data;
+// Function to load traffic segments
+function loadTrafficSegments() {
+    fetch('/api/traffic-segments/')
+        .then(response => response.json())
+        .then(data => {
+            // Remove existing traffic layer if it exists
+            if (trafficLayer) {
+                map.removeLayer(trafficLayer);
+            }
+            hold_data = data;
+            // Create new traffic layer
+            trafficLayer = L.geoJSON(data, {
+                style: function(feature) {
+                    const speed = feature.properties._current_speed;
+                    return {
+                        color: getSpeedColor(speed),
+                        weight: getLineWidth(speed),
+                        opacity: 0.8,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    const props = feature.properties;
+                    const speed = props._current_speed;
+                    const speedText = speed !== null ? `${speed} mph` : 'No data';
+
+                    const popupContent = `
+                        <div style="font-size: 12px;">
+                            <strong>${props.street} ${props.direction}</strong><br>
+                            From: ${props.from_street}<br>
+                            To: ${props.to_street}<br>
+                            Current Speed: <strong>${speedText}</strong><br>
+                            Length: ${props.length} miles<br>
+                            Last Updated: ${props._last_updated}
+                        </div>
+                    `;
+
+                    layer.bindPopup(popupContent);
+
+                    // Add hover effects
+                    layer.on('mouseover', function(e) {
+                        this.setStyle({
+                            weight: this.options.weight + 2,
+                            opacity: 1
+                        });
+                    });
+
+                    layer.on('mouseout', function(e) {
+                        this.setStyle({
+                            weight: this.options.weight - 2,
+                            opacity: 0.8
+                        });
+                    });
+                }
+            });
+
+            // Add traffic layer to map
+            trafficLayer.addTo(map);
+
+            // Fit map to show Chicago area (optional)
+            if (data.features.length > 0) {
+                map.fitBounds(trafficLayer.getBounds());
+            }
+        })
+        .catch(error => {
+            console.error('Error loading traffic segments:', error);
+        });
+}
+
+// Function to create legend
+function createLegend() {
+    const legend = L.control({position: 'bottomright'});
+
+    legend.onAdd = function(map) {
+        const div = L.DomUtil.create('div', 'info legend');
+        div.style.backgroundColor = 'white';
+        div.style.padding = '10px';
+        div.style.borderRadius = '5px';
+        div.style.boxShadow = '0 0 15px rgba(0,0,0,0.2)';
+
+        div.innerHTML = `
+            <h4>Traffic Speed</h4>
+            <div><span style="color: #00ff00; font-weight: bold;">■</span> 35+ mph</div>
+            <div><span style="color: #ffff00; font-weight: bold;">■</span> 25-34 mph</div>
+            <div><span style="color: #ff8800; font-weight: bold;">■</span> 15-24 mph</div>
+            <div><span style="color: #ff0000; font-weight: bold;">■</span> < 15 mph</div>
+            <div><span style="color: #808080; font-weight: bold;">■</span> No data</div>
+        `;
+
+        return div;
+    };
+
+    legend.addTo(map);
+}
 
 function updateLayerControl() {
     $('#layer-control-icon').attr('src', layers[currentLayer].icon);
@@ -77,6 +191,15 @@ function initializeMap() {
 $(document).ready(function () {
     initializeMap();
     resizeMap();
+
+    loadTrafficSegments();
+
+    // Create legend
+    createLegend();
+
+    // Auto-refresh traffic data every 5 minutes
+    setInterval(loadTrafficSegments, 5 * 60 * 1000);
+
 
     $(window).resize(resizeMap);
     updateLayerControl();
