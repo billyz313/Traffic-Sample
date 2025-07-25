@@ -14,6 +14,11 @@ for this application to avoid any issues.
 ### Recommended
 Conda (To manage packages within the application own environment)
 
+### Clone Repo
+```commandline
+git clone git@github.com:billyz313/Traffic-Sample.git
+```
+
 ### Environment
 - Create the env
 
@@ -30,6 +35,7 @@ conda activate eax
 - Create database tables and superuser
 ###### follow prompts after each command
 ```shell
+cd Traffic-Sample
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py collectstatic
