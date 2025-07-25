@@ -43,7 +43,7 @@ python manage.py runserver
 
 ### Contact
 
-Please feel free to contact us if you have any questions.
+Please feel free to contact me if you have any questions.
 
 ### Authors
 
