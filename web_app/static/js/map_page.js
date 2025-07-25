@@ -37,10 +37,10 @@ const layers = {
 
 // Function to get color based on speed
 function getSpeedColor(speed) {
-    if (speed === null || speed === -1) return '#808080'; // Gray for no data
-    if (speed >= 35) return '#00ff00'; // Green for fast
-    if (speed >= 25) return '#ffff00'; // Yellow for moderate
-    if (speed >= 15) return '#ff8800'; // Orange for slow
+    if (speed === null || parseInt(speed) === -1) return '#808080'; // Gray for no data
+    if (parseInt(speed) >= 35) return '#00ff00'; // Green for fast
+    if (parseInt(speed) >= 25) return '#ffff00'; // Yellow for moderate
+    if (parseInt(speed) >= 15) return '#ff8800'; // Orange for slow
     return '#ff0000'; // Red for very slow
 }
 
