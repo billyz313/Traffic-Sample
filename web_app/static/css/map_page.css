@@ -1,0 +1,386 @@
+main {
+    padding: 0;
+    display: flex;
+}
+
+#map {
+    height: calc(100vh - 71px);
+    width: 100%;
+    transition: width 0.3s ease-out;
+    position: relative; /* Needed for absolute positioning of toggle */
+}
+
+.footer {
+    display: none;
+    /* Hide the footer */
+}
+
+/* Position the layer control */
+#layer-control {
+    position: absolute;
+    top: 80px;
+    left: 10px;
+    z-index: 1000;
+    background-color: white;
+    border-radius: 2px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+#layer-control-toggle {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+#layer-control-toggle img {
+    width: 24px;
+    height: 24px;
+}
+
+#layer-list {
+    display: none;
+    position: absolute;
+    left: 44px;
+    bottom: 0;
+    background-color: white;
+    border-radius: 2px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+    padding: 5px;
+}
+
+#layer-list.show {
+    display: flex;
+}
+
+.layer-item {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.layer-item:last-child {
+    margin-right: 0;
+}
+
+.layer-item img {
+    width: 100%;
+    height: 100%;
+}
+
+.layer-item:hover {
+    opacity: 0.7;
+}
+
+/* Style to match Leaflet's zoom control */
+.leaflet-bar {
+    border: none;
+    border-radius: 2px;
+}
+
+.leaflet-control-zoom a {
+    background-color: white;
+    border: 1px solid #ccc;
+    color: #333;
+    display: block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.leaflet-control-zoom a:first-child {
+    border-bottom: none;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+.leaflet-control-zoom a:last-child {
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+.leaflet-control-zoom a:hover {
+    background-color: #f4f4f4;
+}
+
+/* Sidebar Styles */
+#sidebar {
+    width: 0;
+    overflow-x: hidden;
+    transition: 0.3s;
+    background-color: white;
+    height: calc(100vh - 80px);
+    position: absolute;
+    top: 80px;
+    right: 0;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+#sidebar.open {
+    width: 25%;
+    min-width: 300px;
+}
+
+#sidebar-title {
+    width: calc(100% - 20px);
+    color: #0a58ca;
+}
+
+#sidebar-content {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+#sidebar-header {
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.custom-card {
+    background: none;
+    box-shadow: none;
+    margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border-left: none;
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.custom-card .card-body .card-title {
+    font-size: 1rem;
+    margin: 0 0 10px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+}
+
+.custom-card .card-body .card-title .card-title-inner {
+    display: inline-block;
+    animation: scroll-x 10s infinite normal none;
+    padding-right: 10px;
+}
+
+@keyframes scroll-x {
+    0% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(calc(-100% + calc(100% - 250px)));
+    }
+    75% {
+        transform: translateX(calc(-100% + calc(100% - 250px)));
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.custom-card .card-body .card-title:hover .card-title-inner {
+    animation-play-state: paused;
+}
+
+.hero-image-container {
+    width: 100px;
+    height: 100px;
+    margin-right: 15px;
+    overflow: hidden;
+    float: left;
+}
+
+.search-box {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 10px 20px;
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.accordion {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.accordion-button:not(.collapsed) {
+    color: white;
+    background-color: #e4002b;
+    box-shadow: inset 0 2px 0 #e4002ba3;
+}
+
+.accordion-button::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23e4002b'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+.accordion-button:not(.collapsed)::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+.accordion-button:focus {
+    z-index: 3;
+    border-color: transparent;
+    outline: 0;
+    box-shadow: 0 0 0 0 #e4002ba3;
+}
+
+.accordion-button.collapsed {
+    color: #0a58ca;
+}
+
+.accordion-label {
+    flex-grow: 1;
+}
+
+.accordion-label-count {
+    margin-right: 20px;
+}
+
+.accordion-item {
+    flex-shrink: 0;
+    display: flex; /* NEW: Flex for item layout */
+    flex-direction: column; /* NEW: Stack item content */
+    max-height: calc(100% - 220px);
+}
+
+.accordion-header {
+    flex-shrink: 0; /* NEW: Don't shrink the header */
+}
+
+.accordion-collapse {
+    height: auto !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    transition: height 0.93s ease;
+}
+
+.accordion-collapse.collapsing {
+    transition: none; /* Disable transition during collapsing */
+    height: 0 !important; /* Ensure immediate collapse */
+    display: none; /* Hide immediately */
+    overflow: hidden;
+}
+
+.accordion-collapse.collapse.show {
+    height: auto !important; /* Ensure it expands properly */
+    display: flex; /* Restore display */
+    transition: height 0.3s ease;
+}
+
+.accordion-body {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding: 1rem 0;
+    height: auto !important;
+}
+
+#sidebar-close-btn {
+    cursor: pointer;
+    font-size: 20px;
+    color: #0d6efd;
+}
+
+/* Layer Toggle Styles */
+#layer-toggle {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+    padding: 5px;
+    display: flex;
+}
+
+.btn-primary {
+    --bs-btn-border-color: none;
+}
+
+/* Cluster Styles */
+.marker-cluster, .marker-cluster-small div {
+    background-color: rgba(68, 138, 255, 0.6) !important;
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 50%;
+    text-align: center;
+}
+
+.marker-cluster-small span {
+    color: white !important;
+    line-height: 20px;
+}
+
+.marker-cluster-medium div {
+    background-color: rgba(51, 122, 183, 0.6) !important;
+}
+
+.marker-cluster-medium span {
+    color: white !important;
+}
+
+.marker-cluster-large div {
+    background-color: rgba(40, 96, 144, 0.6) !important;
+}
+
+.marker-cluster-large span {
+    color: white !important;
+}
+
+.contacts-item, .organizations-item, .document-item {
+    padding-left: 20px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+#applications-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: stretch; /* Stretch items vertically */
+}
+
+.application-item, .organizations-item-none, .contacts-item-none, .document-item-none {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 0 10px 0;
+    width: 100%;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    flex-grow: 1; /* Allow items to grow to fill available space */
+}
+
+.application-item img {
+    max-width: 100%;
+    height: auto;
+    max-height: 150px;
+    object-fit: cover;
+}
+
+.application-item a {
+    text-align: center;
+    margin-top: auto; /* Push the link to the bottom */
+    text-decoration: none;
+
+}
