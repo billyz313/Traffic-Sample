@@ -29,10 +29,12 @@ def traffic_segments_api(request):
         'sample_rows': [],
         'column_names': None
     }
+
+    current_time_param = request.GET.get('time', '1')
     try:
         # Path to your CSV file
         csv_path = os.path.join(settings.BASE_DIR,
-                                'web_app\data\Chicago_Traffic_Tracker_-_Congestion_Estimates_by_Segments.csv')
+                                f'web_app\data\Chicago_Traffic_Tracker_-_Congestion_Estimates_by_Segments{current_time_param}.csv')
 
         # Check if file exists
         debug_info['file_exists'] = os.path.exists(csv_path)

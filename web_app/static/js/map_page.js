@@ -53,14 +53,20 @@ function getLineWidth(speed) {
     return 6;
 }
 let hold_data;
+
+let current_time = 1;
 // Function to load traffic segments
 function loadTrafficSegments() {
-    fetch('/api/traffic-segments/')
+    fetch(`/api/traffic-segments/?time=${current_time}`)
         .then(response => response.json())
         .then(data => {
             // Remove existing traffic layer if it exists
             if (trafficLayer) {
                 map.removeLayer(trafficLayer);
+            }
+            current_time++;
+            if (current_time > 4) {
+                current_time = 1;
             }
             hold_data = data;
             // Create new traffic layer
@@ -198,7 +204,7 @@ $(document).ready(function () {
     createLegend();
 
     // Auto-refresh traffic data every 5 minutes
-    setInterval(loadTrafficSegments, 5 * 60 * 1000);
+    setInterval(loadTrafficSegments, 2000);
 
 
     $(window).resize(resizeMap);
