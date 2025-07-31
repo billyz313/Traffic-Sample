@@ -47,6 +47,19 @@ At this point you should be able to start the application.  From the root direct
 python manage.py runserver
 ```
 
+### Import data
+To import data, place the cvs files in the web_app/data directory.  Keep in mind they have to have the matching
+headings that are in the import script.  Run the following command.
+
+```shell
+# if you want existing data cleared first
+python manage.py import_traffic_data --clear_existing
+
+# if you want to append to existing data
+python manage.py import_traffic_data
+```
+
+
 ### Contact
 
 Please feel free to contact me if you have any questions.
