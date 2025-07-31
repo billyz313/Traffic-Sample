@@ -54,21 +54,50 @@ function getLineWidth(speed) {
 }
 let hold_data;
 
-let current_time = 1;
+let next_timestamp = ""; // Initialize as an empty string for the first call
+
 // Function to load traffic segments
 function loadTrafficSegments() {
-    fetch(`/api/traffic-segments/?time=${current_time}`)
-        .then(response => response.json())
+    let apiUrl = "/api/traffic-segments/";
+
+    // If next_timestamp is available, append it as a query parameter
+    if (next_timestamp) {
+        // Encode the timestamp to ensure it's a valid URL component
+        apiUrl += `?datetime=${encodeURIComponent(next_timestamp)}`;
+    }
+
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                // Handle HTTP errors and parse JSON error messages from Django view
+                return response.json().then(errorData => {
+                    const errorMessage = errorData.error || (errorData.debug && errorData.debug.error_messages ? errorData.debug.error_messages.join(', ') : 'Unknown API error');
+                    throw new Error(`API Error ${response.status}: ${errorMessage}`);
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             // Remove existing traffic layer if it exists
             if (trafficLayer) {
                 map.removeLayer(trafficLayer);
             }
-            current_time++;
-            if (current_time > 4) {
-                current_time = 1;
+
+            // Set the next_timestamp from the API response metadata
+            // This is the timestamp for the *next* request
+            if (data.metadata && data.metadata.next_timestamp) {
+                next_timestamp = data.metadata.next_timestamp;
+            } else {
+                console.warn("API response did not contain 'next_timestamp' metadata.");
+                // Potentially reset or handle this scenario (e.g., if no data is found)
+                next_timestamp = ""; // Reset to initial state or oldest
             }
-            hold_data = data;
+
+            console.log("Current data timestamp (from API response):", data.metadata.current_timestamp);
+            console.log("Next timestamp for subsequent request:", next_timestamp);
+
+            hold_data = data; // Assuming hold_data is used elsewhere
+
             // Create new traffic layer
             trafficLayer = L.geoJSON(data, {
                 style: function(feature) {
@@ -84,7 +113,8 @@ function loadTrafficSegments() {
                 onEachFeature: function(feature, layer) {
                     const props = feature.properties;
                     const speed = props._current_speed;
-                    const speedText = speed !== null ? `${speed} mph` : 'No data';
+                    // Ensure speedText handles null, undefined, and -1 appropriately
+                    const speedText = (speed !== null && speed !== undefined && speed !== -1) ? `${speed} mph` : 'No data';
 
                     const popupContent = `
                         <div style="font-size: 12px;">
@@ -93,7 +123,7 @@ function loadTrafficSegments() {
                             To: ${props.to_street}<br>
                             Current Speed: <strong>${speedText}</strong><br>
                             Length: ${props.length} miles<br>
-                            Last Updated: ${props._last_updated}
+                            Last Updated: ${props._last_updated ? new Date(props._last_updated).toLocaleString() : 'N/A'}
                         </div>
                     `;
 
@@ -122,10 +152,13 @@ function loadTrafficSegments() {
             // Fit map to show Chicago area (optional)
             if (data.features.length > 0) {
                 map.fitBounds(trafficLayer.getBounds());
+            } else {
+                console.warn("No features returned for this timestamp.");
             }
         })
         .catch(error => {
             console.error('Error loading traffic segments:', error);
+            // Optionally, handle error by stopping the interval or showing a user message
         });
 }
 
