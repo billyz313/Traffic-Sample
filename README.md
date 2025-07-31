@@ -29,7 +29,7 @@ conda env create -f environment.yml
 - enter the environment
 
 ```shell
-conda activate eax
+conda activate Traffic_sample
 ```
 
 - Create database tables and superuser
