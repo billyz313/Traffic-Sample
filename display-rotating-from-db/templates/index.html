@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="{% static 'css/map_page.css' %}?v={{ version }}"
+    />
+{% endblock %}
+
+{% block content %}
+    <div id="map">
+        <div id="layer-control">
+            <div id="layer-control-toggle">
+                <img id="layer-control-icon" src="" alt="Layer Icon">
+            </div>
+            <div id="layer-list"></div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="https://unpkg.com/esri-leaflet"></script>
+
+    <script>
+        const osm_icon = "{% static 'images/osm.png' %}";
+        const dark_icon = "{% static 'images/dark.png' %}";
+        const sat_icon = "{% static 'images/gsatellite.png' %}";
+        const terrain_icon = "{% static 'images/terrain.png' %}";
+        const gray_icon = "{% static 'images/gray.png' %}";
+
+    </script>
+    <script src="{% static 'js/map_page.js' %}"></script>
+{% endblock %}
