@@ -1,2 +1,8 @@
 *.pyc
 __pycache__
+
+# Caches
+__pycache__/
+
+# Environment variables for Django
+.env
